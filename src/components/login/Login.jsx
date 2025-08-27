@@ -4,23 +4,16 @@ import { getCSRFToken, loginUser } from "../../services/AuthService";
 import { jwtDecode } from "jwt-decode";
 import "./login.css";
 
-
-function Login() {
+// ⬇️ ta emot propen från App.jsx
+function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
 
-  const [credentials, setCredentials] = useState({
-    username: "",
-    password: "",
-  });
-
+  const [credentials, setCredentials] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
-    setCredentials((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setCredentials(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
@@ -30,24 +23,30 @@ function Login() {
 
     try {
       const csrf = await getCSRFToken();
-      const data = await loginUser(credentials, csrf);
+      const data = await loginUser(credentials, csrf); // { token }
       const decoded = jwtDecode(data.token);
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id: decoded.sub,
-          username: decoded.username,
-          avatar: decoded.avatar,
-        })
-      );
+      localStorage.setItem("user", JSON.stringify({
+        id: decoded.sub,
+        username: decoded.username,
+        avatar: decoded.avatar,
+      }));
 
-      
-      setSuccess("Inloggningen lyckades! Du skickas vidare...");
-      setTimeout(() => navigate("/chat"), 1500);
-    } catch (error) {
-      setError(error.message || "Något gick fel vid inloggning.");
+      // ⬇️ uppdatera appens auth-state direkt
+      setIsAuthenticated(true);
+
+      // ⬇️ navigera direkt (utan timeout), replace för snygg historik
+      navigate("/chat", { replace: true });
+
+      setSuccess("Inloggningen lyckades!");
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Något gick fel vid inloggning.";
+      setError(msg);
     }
   };
 
@@ -79,9 +78,7 @@ function Login() {
 
       <p>
         Har du inget konto?{" "}
-        <Link to="/register" className="register-link">
-          Registrera här
-        </Link>
+        <Link to="/register" className="register-link">Registrera här</Link>
       </p>
     </div>
   );
