@@ -1,5 +1,6 @@
-import { logoutUser } from "../services/AuthService";
+import { logoutUser } from "../../services/AuthService";
 import { useNavigate } from "react-router-dom";
+import "./chat.css";
 
 function Chat() {
   const navigate = useNavigate();

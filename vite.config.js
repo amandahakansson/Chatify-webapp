@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://chatwebapp-amanda.chatify.com',
+        target: 'https://chatify-api.up.railway.app',
         changeOrigin: true,
         secure: true,
       },
