@@ -2,11 +2,12 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { getCSRFToken, loginUser } from "../../services/AuthService";
 import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../../context/useAuth"; 
 import "./login.css";
 
-// ⬇️ ta emot propen från App.jsx
-function Login({ setIsAuthenticated }) {
+function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth(); 
 
   const [credentials, setCredentials] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
@@ -23,22 +24,18 @@ function Login({ setIsAuthenticated }) {
 
     try {
       const csrf = await getCSRFToken();
-      const data = await loginUser(credentials, csrf); // { token }
+      const data = await loginUser(credentials, csrf); 
       const decoded = jwtDecode(data.token);
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify({
+      const userData = {
         id: decoded.sub,
         username: decoded.username,
+        email: decoded.email,    
         avatar: decoded.avatar,
-      }));
+      };
 
-      // ⬇️ uppdatera appens auth-state direkt
-      setIsAuthenticated(true);
-
-      // ⬇️ navigera direkt (utan timeout), replace för snygg historik
+      login(userData, data.token);
       navigate("/chat", { replace: true });
-
       setSuccess("Inloggningen lyckades!");
     } catch (err) {
       const msg =
@@ -52,34 +49,36 @@ function Login({ setIsAuthenticated }) {
 
   return (
     <div className="login-wrapper">
-      <h2>Logga in</h2>
-      <form onSubmit={handleSubmit} className="login-form">
-        <input
-          type="text"
-          name="username"
-          placeholder="Användarnamn"
-          value={credentials.username}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Lösenord"
-          value={credentials.password}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit">Logga in</button>
-      </form>
+      <div className="login-box">
+        <h2>Logga in</h2>
+        <form onSubmit={handleSubmit} className="login-form">
+          <input
+            type="text"
+            name="username"
+            placeholder="Användarnamn"
+            value={credentials.username}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Lösenord"
+            value={credentials.password}
+            onChange={handleChange}
+            required
+          />
+          <button type="submit">Logga in</button>
+        </form>
 
-      {error && <p className="error">{error}</p>}
-      {success && <p className="success">{success}</p>}
+        {error && <p className="error">{error}</p>}
+        {success && <p className="success">{success}</p>}
 
-      <p>
-        Har du inget konto?{" "}
-        <Link to="/register" className="register-link">Registrera här</Link>
-      </p>
+        <p>
+          Har du inget konto?{" "}
+          <Link to="/register" className="register-link">Registrera här</Link>
+        </p>
+      </div>
     </div>
   );
 }

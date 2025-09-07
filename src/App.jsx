@@ -1,38 +1,48 @@
-import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/login/Login";
 import Register from "./components/register/Register";
 import Chat from "./components/chat/Chat";
+import { AuthProvider } from "./context/AuthProvider"; 
+import SideNav from "./components/sidenav/Sidenav";
+import { useAuth } from "./context/useAuth";
 
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
+function PrivateRoute({ children }) {
+  const { isLoggedIn } = useAuth();
+  return isLoggedIn ? children : <Navigate to="/login" replace />;
+}
 
-  // optional: lyssna på förändringar i localStorage om du vill
-  useEffect(() => {
-    const handleStorage = () => setIsAuthenticated(!!localStorage.getItem("token"));
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, []);
+function AppLayout() {
+  const { isLoggedIn } = useAuth();
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route
-          path="/login"
-          element={isAuthenticated ? <Navigate to="/chat" /> : <Login setIsAuthenticated={setIsAuthenticated} />}
-        />
-        <Route
-          path="/register"
-          element={isAuthenticated ? <Navigate to="/chat" /> : <Register setIsAuthenticated={setIsAuthenticated} />}
-        />
-        <Route
-          path="/chat"
-          element={isAuthenticated ? <Chat /> : <Navigate to="/login" />}
-        />
-      </Routes>
-    </Router>
+    <div className="app-layout">
+      {isLoggedIn && <SideNav />}
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<Navigate to="/chat" replace />} />
+          <Route path="/login" element={isLoggedIn ? <Navigate to="/chat" replace /> : <Login />} />
+          <Route path="/register" element={isLoggedIn ? <Navigate to="/chat" replace /> : <Register />} />
+          <Route
+            path="/chat"
+            element={
+              <PrivateRoute>
+                <Chat />
+              </PrivateRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+    </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <AppLayout />
+      </Router>
+    </AuthProvider>
+  );
+}
