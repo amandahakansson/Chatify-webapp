@@ -3,7 +3,7 @@ import { registerUser, getCSRFToken, loginUser } from "../../services/AuthServic
 import { useNavigate, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../../context/AuthProvider"; 
-import "./register.css";
+import "./Register.css";
 
 function Register() {
   const navigate = useNavigate();
