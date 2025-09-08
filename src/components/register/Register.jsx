@@ -2,7 +2,7 @@ import { useState } from "react";
 import { registerUser, getCSRFToken, loginUser } from "../../services/AuthService";
 import { useNavigate, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import { useAuth } from "../../context/useAuth"; 
+import { useAuth } from "../../context/AuthProvider"; 
 import "./register.css";
 
 function Register() {
@@ -26,38 +26,23 @@ function Register() {
     }));
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-
+  
     try {
       const csrf = await getCSRFToken();
       await registerUser(formData, csrf);
-
-      const loginData = await loginUser(
-        { username: formData.username, password: formData.password },
-        csrf
-      );
-
-      const decoded = jwtDecode(loginData.token);
-
-      const userData = {
-        id: decoded.sub,
-        username: decoded.username,
-        email: decoded.email, 
-        avatar: decoded.avatar,
-      };
-
-      login(userData, loginData.token);
-
-      setSuccess("Registrering lyckades! Du loggas nu in...");
-      navigate("/chat", { replace: true });
-
+  
+      setSuccess("Registrering lyckades! Logga in för att fortsätta.");
+      navigate("/login", { replace: true });
+  
     } catch (err) {
       setError(err?.message || JSON.stringify(err) || "Registrering misslyckades!");
     }
-  };
+  };  
 
   return (
     <div className="register-wrapper">

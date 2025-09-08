@@ -4,7 +4,7 @@ import Register from "./components/register/Register";
 import Chat from "./components/chat/Chat";
 import { AuthProvider } from "./context/AuthProvider"; 
 import SideNav from "./components/sidenav/Sidenav";
-import { useAuth } from "./context/useAuth";
+import { useAuth } from "./context/AuthProvider";
 
 function PrivateRoute({ children }) {
   const { isLoggedIn } = useAuth();

@@ -1,7 +1,7 @@
 import "./Chat.css";
 import { useEffect, useState, useRef } from "react";
 import DOMPurify from "dompurify";
-import { useAuth } from "../../context/useAuth";
+import { useAuth } from "../../context/AuthProvider";
 import { getMessages, createMessage, deleteMessage } from "../../services/AuthService";
 
 export default function Chat() {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { getCSRFToken, loginUser } from "../../services/AuthService";
 import { jwtDecode } from "jwt-decode";
-import { useAuth } from "../../context/useAuth"; 
+import { useAuth } from "../../context/AuthProvider"; 
 import "./login.css";
 
 function Login() {
