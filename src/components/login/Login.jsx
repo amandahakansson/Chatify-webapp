@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { getCSRFToken, loginUser } from "../../services/AuthService";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../../context/AuthProvider"; 
-import "./login.css";
+import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
